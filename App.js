@@ -13,7 +13,7 @@ export default function App() {
   const [audioResponseUrl, setAudioResponseUrl] = useState('');
   const [conversation, setConversation] = useState([]); // Store conversation messages
   const messageInputRef = useRef(null);
-  const serverUrl = 'http://207.154.239.159:3001';
+  const serverUrl = 'https://king-prawn-app-z9mg3.ondigitalocean.app';
 
   const [visitorName, setVisitorName] = useState('');
   const [hostName, setHostName] = useState('');
