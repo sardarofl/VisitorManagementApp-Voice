@@ -249,6 +249,7 @@ export default function App() {
 
   const handleAIResponse = async (visitorId, transcribedText) => {
     try {
+      console.log("Server URL is: ",serverUrl);
       const response = await fetch(`${serverUrl}/generateResponse`, {
         method: 'POST',
         body: JSON.stringify({ visitorId, transcribedText }),
