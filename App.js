@@ -248,55 +248,70 @@ export default function App() {
   
 
   const handleAIResponse = async (visitorId, transcribedText) => {
-    try {
-      console.log("Server URL is: ",serverUrl);
-      const response = await fetch(`${serverUrl}/generateResponse`, {
-        method: 'POST',
-        body: JSON.stringify({ visitorId, transcribedText }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const data = await response.json();
+    // Helper function to send XMLHttpRequest
+    const sendXmlHttpRequest = (data) => {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState !== 4) {
+            return;
+          }
   
-      if (data.aiResponse && data.aiResponse.text) {
+          if (xhr.status === 200) {
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            reject("Request Failed");
+          }
+        };
+  
+        xhr.open("POST", `${serverUrl}/generateResponse`);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(data);
+      });
+    };
+  
+    try {
+      console.log("Server URL is: ", serverUrl);
+      const response = await sendXmlHttpRequest(JSON.stringify({ visitorId, transcribedText }));
+    
+      if (response.aiResponse && response.aiResponse.text) {
         setConversation(prevConversation => [
           ...prevConversation,
-          { text: data.aiResponse.text, user: false }
+          { text: response.aiResponse.text, user: false }
         ]);
-        setTranscription(data.aiResponse.text);
-
-        if (data.aiResponse.text.includes("Sorry")) {
+        setTranscription(response.aiResponse.text);
+  
+        if (response.aiResponse.text.includes("Sorry")) {
           setIsModalVisible(true);
           // other existing code
         }
-
-        // Parse the response to extract relevant information
-      const aiText = data.aiResponse.text;
-      if (aiText.includes('Your Name:')) {
-        const nameMatch = aiText.match(/Your Name: ([^\,]+)/);
-        if (nameMatch) setVisitorName(nameMatch[1].trim());
-      }
-      if (aiText.includes('You Will be Visiting:')) {
-        const hostMatch = aiText.match(/You Will be Visiting: ([^\,]+)/);
-        if (hostMatch) setHostName(hostMatch[1].trim());
-      }
-      if (aiText.includes('Purpose of Visit:')) {
-        const purposeMatch = aiText.match(/Purpose of Visit: ([^\.\n]+)/);
-        if (purposeMatch) setVisitPurpose(purposeMatch[1].trim());
-      }
-
-      setShouldStartRecording(true);
-    }
   
-      if (data.aiResponse && data.aiResponse.audioUrl) {
-        setAudioResponseUrl(data.aiResponse.audioUrl);
-        playAudioResponse(data.aiResponse.audioUrl);
+        // Parse the response to extract relevant information
+        const aiText = response.aiResponse.text;
+        if (aiText.includes('Your Name:')) {
+          const nameMatch = aiText.match(/Your Name: ([^\,]+)/);
+          if (nameMatch) setVisitorName(nameMatch[1].trim());
+        }
+        if (aiText.includes('You Will be Visiting:')) {
+          const hostMatch = aiText.match(/You Will be Visiting: ([^\,]+)/);
+          if (hostMatch) setHostName(hostMatch[1].trim());
+        }
+        if (aiText.includes('Purpose of Visit:')) {
+          const purposeMatch = aiText.match(/Purpose of Visit: ([^\.\n]+)/);
+          if (purposeMatch) setVisitPurpose(purposeMatch[1].trim());
+        }
+  
+        setShouldStartRecording(true);
+      }
+    
+      if (response.aiResponse && response.aiResponse.audioUrl) {
+        setAudioResponseUrl(response.aiResponse.audioUrl);
+        playAudioResponse(response.aiResponse.audioUrl);
       }
       setIsProcessing(false); // Processing complete
-
+  
     } catch (error) {
-      console.error('Error generating AI response', error);
+      console.error('Error generating XHR AI response', error);
     }
   };
   
