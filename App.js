@@ -561,6 +561,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     maxWidth: '70%',
+    fontSize: 22, // Increase font size here
   },
   aiText: {
     backgroundColor: '#6750A4',
@@ -568,6 +569,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     maxWidth: '70%',
+    fontSize: 22, // Increase font size here
   },
   input: {
     width: '100%',
@@ -601,7 +603,7 @@ const styles = StyleSheet.create({
     // Add more styling as needed
   },
   largeButtonText: {
-    fontSize: 18, // Increase font size
+    fontSize: 22, // Increase font size
     // Add more text styling as needed
   },
   // Updated modal style for scrollable content
