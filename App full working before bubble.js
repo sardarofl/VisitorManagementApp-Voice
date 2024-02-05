@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, FlatList, ScrollView  ,TouchableWithoutFeedback ,Image, ActivityIndicator ,Dimensions} from 'react-native'; // Import necessary components
+import { StyleSheet, View, Text, FlatList, ScrollView  ,TouchableWithoutFeedback ,Image, ActivityIndicator } from 'react-native'; // Import necessary components
 import { Audio } from 'expo-av';
 import uuid from 'react-native-uuid';
 import { FAB,TextInput, PaperProvider, Card, Button as PaperButton } from 'react-native-paper';
 import { Modal, Searchbar , List } from 'react-native-paper';
-import ChatBubble from './components/ChatBubble.js';
+import ChatBubble from '../components/ChatBubble';
+
  
 export default function App() {
   const [recording, setRecording] = useState(null);
@@ -43,7 +44,6 @@ export default function App() {
   const [countdown, setCountdown] = useState(4); // State for the countdown timer
 
 
-
   const resetVisitor = () => {
     setVisitorId(uuid.v4());
     setTranscription('');
@@ -55,22 +55,6 @@ export default function App() {
     setVisitPurpose('');
   };
   
-  // Compute the adjusted styles for each message
-  const getStyleForMessage = (index, totalMessages) => {
-    // Assuming the last message in the displayedConversation array is the most recent
-    const isLatestMessage = index === totalMessages - 1;
-    const scale = isLatestMessage ? 1 : 0.9 - (0.05 * (totalMessages - index - 1));
-    const opacity = isLatestMessage ? 1 : 0.6 + (0.2 * (totalMessages - index - 1));
-    return {
-      zIndex: index, // Ensures the most recent message has the highest zIndex
-      opacity,
-      transform: [{ scale }],
-      position: 'absolute',
-      width: '100%', // Ensure full width
-      // Adjust bottom based on your design needs
-      bottom: (totalMessages - index - 1) * 40, // Creates a stacked look
-    };
-  };
 
   // const playGreeting = async () => {
   //   const sound = new Audio.Sound();
@@ -120,7 +104,6 @@ export default function App() {
 
   React.useEffect(() => {
     fetchAvailableInputs();
-
   }, []);
 
   useEffect(() => {
@@ -377,23 +360,6 @@ export default function App() {
     </View>
   );
 
-  const renderMessage = (message, index) => {
-    const totalMessages = displayedConversation.length;
-    const isLatestMessage = index === totalMessages - 1;
-    const style = getStyleForMessage(index, totalMessages);
-    const key = `message-${index}`;
-  
-    return (
-      <ChatBubble
-        key={key}
-        message={message.text}
-        toldby={message.user.toString()}
-        isLatestMessage={isLatestMessage} // Pass this new prop
-        style={style}
-      />
-    );
-  };
-
   const handleGreeting = async () => {
     setIsProcessing(true);
     setIsFullScreenModalVisible(false); // Hide the full-screen modal
@@ -406,19 +372,15 @@ export default function App() {
     handleAIResponse(visitorId, "Arganzo Megado");
 
   };
-// Only keep the last three messages, already in correct order for display
-const displayedConversation = conversation.slice(-3);
- const windowHeight = Dimensions.get('window').width;
- 
- const oneThirdHeight = Dimensions.get('window').height / 3;
- return (
+
+  return (
     <PaperProvider>
       <View style={styles.container}>
       
 
 
         {/* Conversation container */}
-        {/* <View style={styles.conversationContainer}>
+        <View style={styles.conversationContainer}>
           <FlatList
             data={conversation}
             renderItem={renderItem}
@@ -426,14 +388,9 @@ const displayedConversation = conversation.slice(-3);
             ref={messageInputRef}
             onContentSizeChange={() => messageInputRef.current.scrollToEnd({ animated: true })}
           />
-        </View> */}
-       
-       <ScrollView 
-          style={[styles.conversationContainer, { height: oneThirdHeight }]} 
-          contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}
-        >  
-          {displayedConversation.map((message, index) => renderMessage(message, index))}
-      </ScrollView>
+        </View>
+
+
         <Text></Text>
         <View style={styles.buttonRow}>
         {isProcessing ? (
@@ -447,7 +404,7 @@ const displayedConversation = conversation.slice(-3);
             style={styles.largeButton}
             contentStyle={styles.largeButtonText}
           >
-            Push and Hold to Talk
+            Push to Talk
           </PaperButton> 
         )}
         
@@ -562,10 +519,7 @@ const displayedConversation = conversation.slice(-3);
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-      {
-      // Conditionally render the skirt based on isFullScreenModalVisible
-      !isFullScreenModalVisible && <View style={styles.skirt}></View>
-    }
+
     </PaperProvider>
 
     
@@ -585,6 +539,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   conversationContainer: {
+    flex: 1,
     width: '100%',
     marginTop: 20,
     backgroundColor: '#211F26', // Background color for conversation container
@@ -606,16 +561,16 @@ const styles = StyleSheet.create({
     color: '#6750A4',
     padding: 10,
     borderRadius: 10,
-    maxWidth: '80%',
-    fontSize: 55, // Increase font size here
+    maxWidth: '70%',
+    fontSize: 22, // Increase font size here
   },
   aiText: {
     backgroundColor: '#6750A4',
     color: 'white',
     padding: 10,
     borderRadius: 10,
-    maxWidth: '80%',
-    fontSize: 55, // Increase font size here
+    maxWidth: '70%',
+    fontSize: 22, // Increase font size here
   },
   input: {
     width: '100%',
@@ -649,7 +604,7 @@ const styles = StyleSheet.create({
     // Add more styling as needed
   },
   largeButtonText: {
-    fontSize: 32, // Increase font size
+    fontSize: 22, // Increase font size
     // Add more text styling as needed
   },
   // Updated modal style for scrollable content
@@ -765,10 +720,5 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     color: '#000',
-  },
-  skirt: {
-    height: 230, // Adjust this height as needed
-    width: '100%',
-    backgroundColor: '#4A4458', // Set this to match the rest of your app's background
   },
 });
